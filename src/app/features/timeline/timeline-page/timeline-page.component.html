@@ -1,0 +1,27 @@
+<div class="timeline-page">
+  <app-timeline-header
+    [timeScale]="timeScale"
+    (timeScaleChange)="onTimeScaleChange($event)"
+    (todayClick)="onTodayClick()"
+  />
+
+  <app-timeline-grid
+    [workCenters]="workCenters"
+    [workOrders]="workOrders"
+    [timeScale]="timeScale"
+    (emptyAreaClick)="onEmptyAreaClick($event)"
+    (editWorkOrder)="onEditWorkOrder($event)"
+    (deleteWorkOrder)="onDeleteWorkOrder($event)"
+  />
+
+  <app-work-order-panel
+    [mode]="panelMode"
+    [isOpen]="panelOpen"
+    [workOrder]="selectedWorkOrder"
+    [workCenterId]="selectedWorkCenterId"
+    [prefilledDate]="clickedDate"
+    [workCenters]="workCenters"
+    (save)="onPanelSave($event)"
+    (close)="onPanelClose()"
+  />
+</div>

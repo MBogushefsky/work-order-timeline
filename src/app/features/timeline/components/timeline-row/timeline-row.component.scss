@@ -1,0 +1,12 @@
+.row-track {
+  position: relative;
+  height: 52px;
+  display: flex;
+  cursor: pointer;
+}
+
+.row-cell {
+  flex-shrink: 0;
+  border-right: 1px solid var(--color-grid-line, #F0F0F0);
+  height: 100%;
+}

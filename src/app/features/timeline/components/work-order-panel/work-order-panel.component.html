@@ -1,0 +1,106 @@
+<div class="panel-overlay" [class.open]="isOpen" (click)="onClose()"></div>
+<div class="panel" role="dialog" aria-label="Work Order Details" [class.open]="isOpen" (click)="$event.stopPropagation()">
+  <div class="panel-header">
+    <div class="panel-header-left">
+      <h2 class="panel-title">Work Order Details</h2>
+      <p class="panel-subtitle">Specify the dates, name and status for this order</p>
+    </div>
+    <div class="panel-header-right">
+      <button type="button" class="btn-cancel" (click)="onClose()">Cancel</button>
+      <button type="button" class="btn-create" (click)="onSubmit()">
+        {{ mode === 'create' ? 'Create' : 'Save' }}
+      </button>
+    </div>
+  </div>
+
+  <form class="panel-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+    @if (overlapError) {
+      <div class="overlap-error">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="#DC2626">
+          <path d="M8 1a7 7 0 100 14A7 7 0 008 1zm-.75 4a.75.75 0 011.5 0v3a.75.75 0 01-1.5 0V5zm.75 6.5a1 1 0 110-2 1 1 0 010 2z"/>
+        </svg>
+        <span>This work order overlaps with an existing order on the same work center. Please adjust the dates.</span>
+      </div>
+    }
+
+    <div class="form-group">
+      <label class="form-label" for="wo-name">Work Order Name</label>
+      <input
+        #nameInput
+        id="wo-name"
+        class="form-input"
+        type="text"
+        formControlName="name"
+        placeholder="Name"
+        aria-required="true"
+        [class.invalid]="form.get('name')?.invalid && form.get('name')?.touched"
+      />
+      @if (form.get('name')?.invalid && form.get('name')?.touched) {
+        <span class="form-error">Name is required</span>
+      }
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <ng-select
+        formControlName="status"
+        [items]="statusOptions"
+        bindLabel="label"
+        bindValue="value"
+        [clearable]="false"
+        [searchable]="false"
+        class="status-select"
+      ></ng-select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="wo-end-date">End date</label>
+      <div class="input-group">
+        <input
+          id="wo-end-date"
+          class="form-input"
+          placeholder="MM.DD.YYYY"
+          ngbDatepicker
+          #dpEnd="ngbDatepicker"
+          formControlName="endDate"
+          [container]="'body'"
+          aria-required="true"
+          [class.invalid]="(form.get('endDate')?.invalid || form.hasError('endBeforeStart')) && form.get('endDate')?.touched"
+          (click)="dpEnd.toggle()"
+          readonly
+        />
+      </div>
+      @if (form.get('endDate')?.invalid && form.get('endDate')?.touched) {
+        <span class="form-error">End date is required</span>
+      }
+      @if (form.hasError('endBeforeStart') && form.get('endDate')?.touched) {
+        <span class="form-error">End date must be after start date</span>
+      }
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="wo-start-date">Start date</label>
+      <div class="input-group">
+        <input
+          id="wo-start-date"
+          class="form-input"
+          placeholder="MM.DD.YYYY"
+          ngbDatepicker
+          #dpStart="ngbDatepicker"
+          formControlName="startDate"
+          [container]="'body'"
+          aria-required="true"
+          [class.invalid]="form.get('startDate')?.invalid && form.get('startDate')?.touched"
+          (click)="dpStart.toggle()"
+          readonly
+        />
+      </div>
+      @if (form.get('startDate')?.invalid && form.get('startDate')?.touched) {
+        <span class="form-error">Start date is required</span>
+      }
+    </div>
+
+    <!-- Hidden work center field — auto-filled from click context -->
+    <input type="hidden" formControlName="workCenterId" />
+  </form>
+</div>

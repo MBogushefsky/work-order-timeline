@@ -1,0 +1,76 @@
+<div class="grid-container" role="grid" aria-label="Work order schedule timeline">
+  <!-- Fixed left panel: work center names -->
+  <div class="left-panel" #leftPanel>
+    <div class="left-header">
+      <span>Work Center</span>
+    </div>
+    <div class="left-rows">
+      @for (wc of workCenters; track wc.docId) {
+        <div class="left-row" role="rowheader">
+          <span class="wc-name">{{ wc.data.name }}</span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Scrollable right panel: timeline grid -->
+  <div class="right-panel" #scrollContainer (scroll)="onRightScroll()">
+    <!-- Column headers -->
+    <div class="column-headers" [style.width.px]="totalWidth">
+      @for (col of columns; track col.date) {
+        <div
+          class="column-header"
+          [style.width.px]="columnWidth"
+          [class.current]="isCurrentPeriod(col.date)"
+          [class.weekend]="isWeekend(col.date)"
+        >
+          @if (isCurrentPeriod(col.date)) {
+            <span class="current-badge">Current month</span>
+          }
+          <span class="col-label">{{ col.label }}</span>
+          @if (col.sublabel) {
+            <span class="col-sublabel">{{ col.sublabel }}</span>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Row tracks -->
+    <div class="row-container" [style.width.px]="totalWidth">
+      <!-- Column grid lines (visual) -->
+      <div class="grid-lines" [style.width.px]="totalWidth">
+        @for (col of columns; track col.date) {
+          <div
+            class="grid-line"
+            [style.width.px]="columnWidth"
+            [class.current]="isCurrentPeriod(col.date)"
+            [class.weekend]="isWeekend(col.date)"
+          ></div>
+        }
+      </div>
+
+      <!-- Today indicator -->
+      <app-today-indicator
+        [visibleRange]="visibleRange"
+        [timeScale]="timeScale"
+      />
+
+      <!-- Work center rows -->
+      @for (wc of workCenters; track wc.docId) {
+        <app-timeline-row
+          role="row"
+          [workCenter]="wc"
+          [workOrders]="getOrdersForCenter(wc.docId)"
+          [columns]="columns"
+          [columnWidth]="columnWidth"
+          [totalWidth]="totalWidth"
+          [visibleRange]="visibleRange"
+          [timeScale]="timeScale"
+          (emptyClick)="emptyAreaClick.emit($event)"
+          (editOrder)="editWorkOrder.emit($event)"
+          (deleteOrder)="deleteWorkOrder.emit($event)"
+        />
+      }
+    </div>
+  </div>
+</div>

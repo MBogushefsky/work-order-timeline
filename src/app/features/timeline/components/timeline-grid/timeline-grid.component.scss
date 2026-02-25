@@ -1,0 +1,148 @@
+.grid-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  border-top: 1px solid var(--color-border);
+}
+
+// --- Left panel (fixed) ---
+.left-panel {
+  flex: 0 0 220px;
+  border-right: 1px solid var(--color-border);
+  background: var(--color-white);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.left-header {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-white);
+  flex-shrink: 0;
+}
+
+.left-rows {
+  flex: 1;
+  overflow: hidden;
+}
+
+.left-row {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--color-grid-line);
+  transition: background-color 0.1s;
+
+  &:hover {
+    background: var(--color-bg-hover);
+  }
+}
+
+.wc-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// --- Right panel (scrollable) ---
+.right-panel {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  position: relative;
+}
+
+.column-headers {
+  display: flex;
+  position: sticky;
+  top: 0;
+  z-index: 8;
+  background: var(--color-white);
+  border-bottom: 1px solid var(--color-border);
+  height: 52px;
+}
+
+.column-header {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border-right: 1px solid var(--color-grid-line);
+  font-size: 12px;
+  position: relative;
+
+  &.current {
+    background: rgba(99, 91, 255, 0.06);
+  }
+
+  &.weekend {
+    background: rgba(0, 0, 0, 0.015);
+  }
+}
+
+.col-label {
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.col-sublabel {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}
+
+.current-badge {
+  position: absolute;
+  top: 4px;
+  font-size: 9px;
+  font-weight: 600;
+  color: #065F46;
+  background: #D1FAE5;
+  padding: 1px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+// --- Row container ---
+.row-container {
+  position: relative;
+}
+
+.grid-lines {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.grid-line {
+  flex-shrink: 0;
+  border-right: 1px solid var(--color-grid-line);
+  height: 100%;
+
+  &.current {
+    background: rgba(99, 91, 255, 0.04);
+  }
+
+  &.weekend {
+    background: rgba(0, 0, 0, 0.015);
+  }
+}

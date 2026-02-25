@@ -1,0 +1,86 @@
+.timeline-header {
+  padding: 24px 32px 16px;
+  background: var(--color-white);
+}
+
+.logo {
+  margin-bottom: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.logo-nao {
+  color: var(--color-primary);
+}
+
+.logo-logic {
+  color: var(--color-text-primary);
+}
+
+.header-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 16px;
+}
+
+.timescale-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.timescale-label {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+
+.today-btn {
+  margin-left: 12px;
+  padding: 4px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-white);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-text-primary);
+  }
+}
+
+:host ::ng-deep .scale-dropdown {
+  width: 110px;
+
+  .ng-select-container {
+    border: none !important;
+    background: transparent !important;
+    min-height: 28px !important;
+    box-shadow: none !important;
+  }
+
+  .ng-value-container {
+    padding: 0 !important;
+  }
+
+  .ng-value {
+    color: var(--color-primary) !important;
+    font-weight: 500;
+    font-size: 13px;
+  }
+
+  .ng-arrow-wrapper {
+    padding: 0 0 0 4px;
+
+    .ng-arrow {
+      border-color: var(--color-primary) transparent transparent !important;
+    }
+  }
+}
