@@ -25,7 +25,7 @@
           [class.weekend]="isWeekend(col.date)"
         >
           @if (isCurrentPeriod(col.date)) {
-            <span class="current-badge">Current month</span>
+            <span class="current-badge">{{ currentPeriodLabel }}</span>
           }
           <span class="col-label">{{ col.label }}</span>
           @if (col.sublabel) {

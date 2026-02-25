@@ -3,6 +3,11 @@
   height: 52px;
   display: flex;
   cursor: pointer;
+  transition: background-color 0.1s;
+
+  &:hover {
+    background: var(--color-bg-hover);
+  }
 }
 
 .row-cell {

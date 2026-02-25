@@ -79,6 +79,14 @@ export class TimelineGridComponent implements OnChanges, AfterViewInit {
     return dateStr === todayIso();
   }
 
+  get currentPeriodLabel(): string {
+    switch (this.timeScale) {
+      case 'day': return 'Today';
+      case 'week': return 'Current week';
+      case 'month': return 'Current month';
+    }
+  }
+
   /** Check if a column date falls in the current period (month for month view, week for week, today for day) */
   isCurrentPeriod(dateStr: string): boolean {
     const today = todayIso();
