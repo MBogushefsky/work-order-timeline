@@ -4,20 +4,21 @@
 // ng-select default theme
 @import '@ng-select/ng-select/themes/default.theme.css';
 
-// ── CSS Variables ──
+// ── CSS Variables (matched to Sketch design tokens) ──
 :root {
-  // Colors
-  --color-primary: #635BFF;
-  --color-primary-hover: #524AE8;
+  // Colors — from Sketch file
+  --color-primary: #3E40DB;
+  --color-primary-hover: #3234B8;
   --color-white: #FFFFFF;
-  --color-bg-subtle: #F9FAFB;
-  --color-bg-hover: #F3F4F6;
-  --color-border: #E5E7EB;
-  --color-grid-line: #F0F0F0;
-  --color-text-primary: #1F2937;
-  --color-text-secondary: #6B7280;
-  --color-placeholder: #C4C4C4;
+  --color-bg-subtle: #F7F9FC;
+  --color-bg-hover: #FAFBFD;
+  --color-border: #D8DCEB;
+  --color-grid-line: #E6EBF0;
+  --color-text-primary: #030929;
+  --color-text-secondary: #687196;
+  --color-placeholder: #A4AAC0;
   --color-today-line: #EF4444;
+  --color-panel-title: #2F3059;
 
   // Error colors
   --color-error: #DC2626;
@@ -25,25 +26,35 @@
   --color-error-border: #FECACA;
   --color-error-text: #991B1B;
 
-  // Status colors
-  --color-status-open-bg: #E8F0FE;
-  --color-status-open-border: #4A90D9;
-  --color-status-open-text: #1A56DB;
+  // Status colors — from Sketch artboards
+  --color-status-open-bg: #EEF0FF;
+  --color-status-open-border: #C3C7FF;
+  --color-status-open-text: #3E40DB;
 
-  --color-status-progress-bg: #EDE9FE;
-  --color-status-progress-border: #7C3AED;
-  --color-status-progress-text: #5B21B6;
+  --color-status-progress-bg: #EDEEFF;
+  --color-status-progress-border: #DEE0FF;
+  --color-status-progress-text: #3E40DB;
 
-  --color-status-complete-bg: #D1FAE5;
-  --color-status-complete-border: #10B981;
-  --color-status-complete-text: #065F46;
+  --color-status-complete-bg: #F8FFF3;
+  --color-status-complete-border: #D1FAB3;
+  --color-status-complete-text: #08A268;
 
-  --color-status-blocked-bg: #FEF3C7;
-  --color-status-blocked-border: #F59E0B;
-  --color-status-blocked-text: #92400E;
+  --color-status-blocked-bg: #FFFCF1;
+  --color-status-blocked-border: #FFF5CF;
+  --color-status-blocked-text: #B13600;
+
+  // Badge colors — from Sketch
+  --color-badge-open-bg: #D4D7FF;
+  --color-badge-progress-bg: #D6D8FF;
+  --color-badge-complete-bg: #E1FFCC;
+  --color-badge-blocked-bg: #FCEEB5;
+
+  // Current period badge — uses indigo (same as primary)
+  --color-current-badge-bg: #D4D7FF;
+  --color-current-badge-text: #3E40DB;
 
   // Layout
-  --row-height: 52px;
+  --row-height: 48px;
   --left-panel-width: 220px;
 
   // Z-index layers
@@ -94,7 +105,7 @@ html, body {
 
   &.ng-select-focused .ng-select-container {
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.15);
+    box-shadow: 0 0 0 3px rgba(62, 64, 219, 0.15);
   }
 
   .ng-dropdown-panel {
@@ -111,7 +122,7 @@ html, body {
       }
 
       &.ng-option-selected {
-        background: rgba(74, 144, 217, 0.1);
+        background: rgba(62, 64, 219, 0.1);
         font-weight: 600;
       }
     }
@@ -192,7 +203,7 @@ html, body {
     max-width: 220px;
     padding: 6px 10px;
     color: #fff;
-    background-color: var(--color-text-primary);
+    background-color: var(--color-text-secondary);
     border-radius: 6px;
     text-align: left;
     white-space: pre-line;
@@ -219,7 +230,7 @@ html, body {
       bottom: 0;
       &::before {
         border-width: 4px 4px 0;
-        border-top-color: var(--color-text-primary);
+        border-top-color: var(--color-text-secondary);
       }
     }
   }
@@ -231,7 +242,7 @@ html, body {
       top: 0;
       &::before {
         border-width: 0 4px 4px;
-        border-bottom-color: var(--color-text-primary);
+        border-bottom-color: var(--color-text-secondary);
       }
     }
   }
