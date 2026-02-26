@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, OnChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Subject } from 'rxjs';
 import { WorkCenterDocument } from '../../../../core/models/work-center.model';
 import { WorkOrderDocument } from '../../../../core/models/work-order.model';
 import { TimeScale, DateRange, ColumnDef } from '../../../../core/models/timeline.model';
@@ -15,7 +15,7 @@ interface BarPosition {
 @Component({
   selector: 'app-timeline-row',
   standalone: true,
-  imports: [CommonModule, WorkOrderBarComponent],
+  imports: [WorkOrderBarComponent],
   template: `
     <div
       class="row-track"
@@ -30,6 +30,7 @@ interface BarPosition {
           [workOrder]="bp.order"
           [leftPx]="bp.left"
           [widthPx]="bp.width"
+          [closeAllMenus$]="closeAllMenus$"
           (edit)="editOrder.emit($event)"
           (delete)="deleteOrder.emit($event)"
         />
@@ -47,6 +48,7 @@ export class TimelineRowComponent implements OnChanges {
   @Input() totalWidth = 0;
   @Input() visibleRange!: DateRange;
   @Input() timeScale: TimeScale = 'day';
+  @Input() closeAllMenus$!: Subject<void>;
   @Output() emptyClick = new EventEmitter<{ workCenterId: string; date: string }>();
   @Output() editOrder = new EventEmitter<WorkOrderDocument>();
   @Output() deleteOrder = new EventEmitter<WorkOrderDocument>();

@@ -21,10 +21,10 @@
         <div
           class="column-header"
           [style.width.px]="columnWidth"
-          [class.current]="isCurrentPeriod(col.date)"
-          [class.weekend]="isWeekend(col.date)"
+          [class.current]="col.isCurrentPeriod"
+          [class.weekend]="col.isWeekend"
         >
-          @if (isCurrentPeriod(col.date)) {
+          @if (col.isCurrentPeriod) {
             <span class="current-badge">{{ currentPeriodLabel }}</span>
           }
           <span class="col-label">{{ col.label }}</span>
@@ -43,8 +43,8 @@
           <div
             class="grid-line"
             [style.width.px]="columnWidth"
-            [class.current]="isCurrentPeriod(col.date)"
-            [class.weekend]="isWeekend(col.date)"
+            [class.current]="col.isCurrentPeriod"
+            [class.weekend]="col.isWeekend"
           ></div>
         }
       </div>
@@ -66,6 +66,7 @@
           [totalWidth]="totalWidth"
           [visibleRange]="visibleRange"
           [timeScale]="timeScale"
+          [closeAllMenus$]="closeAllMenus$"
           (emptyClick)="emptyAreaClick.emit($event)"
           (editOrder)="editWorkOrder.emit($event)"
           (deleteOrder)="deleteWorkOrder.emit($event)"

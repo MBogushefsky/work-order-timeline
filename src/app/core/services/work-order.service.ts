@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { WorkOrderDocument } from '../models/work-order.model';
+import { WorkOrderDocument, WorkOrderStatus } from '../models/work-order.model';
 import { SEED_WORK_ORDERS } from '../data/seed-data';
 import { generateId } from '../utils/id-generator';
 
 const STORAGE_KEY = 'work-orders';
+
+const VALID_STATUSES: ReadonlySet<WorkOrderStatus> = new Set(['open', 'in-progress', 'complete', 'blocked']);
 
 @Injectable({ providedIn: 'root' })
 // @upgrade: Replace BehaviorSubject with Angular Signals for fine-grained reactivity
@@ -13,7 +15,7 @@ export class WorkOrderService {
   workOrders$ = this.workOrdersSubject.asObservable();
 
   getAll(): WorkOrderDocument[] {
-    return this.workOrdersSubject.getValue();
+    return [...this.workOrdersSubject.getValue()];
   }
 
   getByWorkCenter(workCenterId: string): WorkOrderDocument[] {
@@ -59,15 +61,35 @@ export class WorkOrderService {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        const parsed = JSON.parse(stored) as WorkOrderDocument[];
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          const valid = parsed.filter((item): item is WorkOrderDocument => this.isValidWorkOrder(item));
+          if (valid.length > 0) {
+            return valid;
+          }
         }
       }
     } catch {
       // Fall through to seed data
     }
     return [...SEED_WORK_ORDERS];
+  }
+
+  private isValidWorkOrder(item: unknown): item is WorkOrderDocument {
+    if (typeof item !== 'object' || item === null) return false;
+    const obj = item as Record<string, unknown>;
+    if (typeof obj['docId'] !== 'string' || obj['docId'].length === 0) return false;
+    if (obj['docType'] !== 'workOrder') return false;
+    if (typeof obj['data'] !== 'object' || obj['data'] === null) return false;
+
+    const data = obj['data'] as Record<string, unknown>;
+    if (typeof data['name'] !== 'string') return false;
+    if (typeof data['workCenterId'] !== 'string') return false;
+    if (typeof data['status'] !== 'string' || !VALID_STATUSES.has(data['status'] as WorkOrderStatus)) return false;
+    if (typeof data['startDate'] !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(data['startDate'])) return false;
+    if (typeof data['endDate'] !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(data['endDate'])) return false;
+
+    return true;
   }
 
   private saveToStorage(orders: WorkOrderDocument[]): void {

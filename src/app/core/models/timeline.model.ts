@@ -9,6 +9,8 @@ export interface ColumnDef {
   label: string;
   sublabel?: string;
   date: string; // ISO start date of this column
+  isCurrentPeriod: boolean;
+  isWeekend: boolean;
 }
 
 export type PanelMode = 'create' | 'edit';

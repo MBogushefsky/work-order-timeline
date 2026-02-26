@@ -32,10 +32,16 @@ export function differenceInDays(a: string, b: string): number {
   return Math.round((da.getTime() - db.getTime()) / 86400000);
 }
 
-/** Add months to an ISO date string */
+/** Add months to an ISO date string (clamps day to last day of target month) */
 export function addMonths(iso: string, months: number): string {
   const d = new Date(iso + 'T00:00:00');
-  d.setMonth(d.getMonth() + months);
+  const targetMonth = d.getMonth() + months;
+  const day = d.getDate();
+  d.setDate(1); // avoid overflow when setting month
+  d.setMonth(targetMonth);
+  // Clamp day to last day of the target month
+  const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  d.setDate(Math.min(day, lastDay));
   return d.toISOString().slice(0, 10);
 }
 
@@ -71,6 +77,9 @@ export function formatDateHeader(iso: string, scale: 'day' | 'week' | 'month'): 
     case 'week': {
       const end = new Date(d);
       end.setDate(end.getDate() + 6);
+      if (end.getMonth() !== d.getMonth()) {
+        return `${months[d.getMonth()]} ${d.getDate()} - ${months[end.getMonth()]} ${end.getDate()}`;
+      }
       return `${months[d.getMonth()]} ${d.getDate()} - ${end.getDate()}`;
     }
     case 'month':

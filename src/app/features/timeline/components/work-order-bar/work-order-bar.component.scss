@@ -11,29 +11,33 @@
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
-  z-index: 2;
+  z-index: var(--z-bars);
   transition: box-shadow 0.15s;
 
   &:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   }
 
+  &.menu-open {
+    z-index: var(--z-bars-menu-open);
+  }
+
   // Status colors — no border per Sketch design
   &.status-open {
-    background: #E8F0FE;
-    color: #1A56DB;
+    background: var(--color-status-open-bg);
+    color: var(--color-status-open-text);
   }
   &.status-in-progress {
-    background: #EDE9FE;
-    color: #5B21B6;
+    background: var(--color-status-progress-bg);
+    color: var(--color-status-progress-text);
   }
   &.status-complete {
-    background: #D1FAE5;
-    color: #065F46;
+    background: var(--color-status-complete-bg);
+    color: var(--color-status-complete-text);
   }
   &.status-blocked {
-    background: #FEF3C7;
-    color: #92400E;
+    background: var(--color-status-blocked-bg);
+    color: var(--color-status-blocked-text);
   }
 }
 
@@ -54,19 +58,19 @@
 
   &.badge-open {
     background: rgba(74, 144, 217, 0.15);
-    color: #1A56DB;
+    color: var(--color-status-open-text);
   }
   &.badge-in-progress {
     background: rgba(124, 58, 237, 0.15);
-    color: #5B21B6;
+    color: var(--color-status-progress-text);
   }
   &.badge-complete {
     background: rgba(16, 185, 129, 0.15);
-    color: #065F46;
+    color: var(--color-status-complete-text);
   }
   &.badge-blocked {
     background: rgba(245, 158, 11, 0.15);
-    color: #92400E;
+    color: var(--color-status-blocked-text);
   }
 }
 
@@ -91,11 +95,11 @@
   top: 100%;
   right: 4px;
   margin-top: 4px;
-  background: var(--color-white, #fff);
-  border: 1px solid var(--color-border, #E5E7EB);
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  z-index: 20;
+  z-index: var(--z-bar-dropdown);
   min-width: 100px;
   overflow: hidden;
 }
@@ -111,16 +115,16 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--color-text-primary, #1F2937);
+  color: var(--color-text-primary);
 
   &:hover {
-    background: var(--color-bg-hover, #F3F4F6);
+    background: var(--color-bg-hover);
   }
 
   &--danger {
-    color: #DC2626;
+    color: var(--color-error);
     &:hover {
-      background: #FEE2E2;
+      background: var(--color-error-bg);
     }
   }
 }

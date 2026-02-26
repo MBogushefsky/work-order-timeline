@@ -42,12 +42,15 @@ describe('TimelineCalcService', () => {
   });
 
   describe('generateColumns', () => {
-    it('generates day columns', () => {
+    it('generates day columns with isCurrentPeriod and isWeekend', () => {
       const range: DateRange = { start: '2025-06-01', end: '2025-06-07' };
       const cols = service.generateColumns(range, 'day');
       expect(cols.length).toBe(7); // 7 days inclusive
       expect(cols[0].date).toBe('2025-06-01');
       expect(cols[0].sublabel).toBeDefined(); // day-of-week abbreviation
+      // 2025-06-01 is a Sunday
+      expect(cols[0].isWeekend).toBe(true);
+      expect(typeof cols[0].isCurrentPeriod).toBe('boolean');
     });
 
     it('generates week columns', () => {

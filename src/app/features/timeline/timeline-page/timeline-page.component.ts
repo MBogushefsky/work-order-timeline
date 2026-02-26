@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { WorkCenterDocument } from '../../../core/models/work-center.model';
 import { WorkOrderDocument } from '../../../core/models/work-order.model';
@@ -14,7 +13,6 @@ import { WorkOrderPanelComponent } from '../components/work-order-panel/work-ord
   selector: 'app-timeline-page',
   standalone: true,
   imports: [
-    CommonModule,
     TimelineHeaderComponent,
     TimelineGridComponent,
     WorkOrderPanelComponent,
@@ -49,6 +47,7 @@ export class TimelinePageComponent implements OnInit, OnDestroy {
     this.workCenters = this.workCenterService.getAll();
     this.sub = this.workOrderService.workOrders$.subscribe(orders => {
       this.workOrders = orders;
+      this.cdr.markForCheck();
     });
   }
 
@@ -59,7 +58,7 @@ export class TimelinePageComponent implements OnInit, OnDestroy {
   onTimeScaleChange(scale: TimeScale): void {
     this.timeScale = scale;
     // Re-center on today after timescale switch
-    setTimeout(() => this.grid?.scrollToToday(), 0);
+    requestAnimationFrame(() => this.grid?.scrollToToday());
   }
 
   onTodayClick(): void {
@@ -84,6 +83,7 @@ export class TimelinePageComponent implements OnInit, OnDestroy {
   }
 
   onDeleteWorkOrder(order: WorkOrderDocument): void {
+    if (!confirm(`Delete "${order.data.name}"? This action cannot be undone.`)) return;
     this.workOrderService.delete(order.docId);
   }
 

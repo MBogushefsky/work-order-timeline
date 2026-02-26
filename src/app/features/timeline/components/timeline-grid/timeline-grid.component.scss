@@ -7,17 +7,17 @@
 
 // --- Left panel (fixed) ---
 .left-panel {
-  flex: 0 0 220px;
+  flex: 0 0 var(--left-panel-width);
   border-right: 1px solid var(--color-border);
   background: var(--color-white);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  z-index: 10;
+  z-index: var(--z-left-panel);
 }
 
 .left-header {
-  height: 52px;
+  height: var(--row-height);
   display: flex;
   align-items: center;
   padding: 0 20px;
@@ -35,7 +35,7 @@
 }
 
 .left-row {
-  height: 52px;
+  height: var(--row-height);
   display: flex;
   align-items: center;
   padding: 0 20px;
@@ -68,10 +68,10 @@
   display: flex;
   position: sticky;
   top: 0;
-  z-index: 8;
+  z-index: var(--z-sticky-header);
   background: var(--color-white);
   border-bottom: 1px solid var(--color-border);
-  height: 52px;
+  height: var(--row-height);
 }
 
 .column-header {
@@ -112,8 +112,8 @@
   top: 4px;
   font-size: 9px;
   font-weight: 600;
-  color: #065F46;
-  background: #D1FAE5;
+  color: var(--color-status-complete-text);
+  background: var(--color-status-complete-bg);
   padding: 1px 6px;
   border-radius: 3px;
   white-space: nowrap;
@@ -130,7 +130,7 @@
   bottom: 0;
   display: flex;
   pointer-events: none;
-  z-index: 0;
+  z-index: var(--z-grid-lines);
 }
 
 .grid-line {

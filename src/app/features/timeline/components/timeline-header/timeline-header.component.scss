@@ -48,39 +48,10 @@
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background-color 0.15s, color 0.15s;
 
   &:hover {
     background: var(--color-bg-hover);
     color: var(--color-text-primary);
-  }
-}
-
-:host ::ng-deep .scale-dropdown {
-  width: 110px;
-
-  .ng-select-container {
-    border: none !important;
-    background: transparent !important;
-    min-height: 28px !important;
-    box-shadow: none !important;
-  }
-
-  .ng-value-container {
-    padding: 0 !important;
-  }
-
-  .ng-value {
-    color: var(--color-primary) !important;
-    font-weight: 500;
-    font-size: 13px;
-  }
-
-  .ng-arrow-wrapper {
-    padding: 0 0 0 4px;
-
-    .ng-arrow {
-      border-color: var(--color-primary) transparent transparent !important;
-    }
   }
 }

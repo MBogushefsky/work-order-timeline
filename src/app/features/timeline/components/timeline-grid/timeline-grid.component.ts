@@ -1,21 +1,21 @@
 import {
-  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output, OnChanges,
-  ViewChild, ElementRef, AfterViewInit,
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostListener, Input, Output,
+  OnChanges, ViewChild, ElementRef, AfterViewInit, SimpleChanges,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Subject } from 'rxjs';
 import { WorkCenterDocument } from '../../../../core/models/work-center.model';
 import { WorkOrderDocument } from '../../../../core/models/work-order.model';
 import { TimeScale, DateRange, ColumnDef } from '../../../../core/models/timeline.model';
 import { TimelineCalcService } from '../../../../core/services/timeline-calc.service';
 import { TimelineRowComponent } from '../timeline-row/timeline-row.component';
 import { TodayIndicatorComponent } from '../today-indicator/today-indicator.component';
-import { todayIso, dayOfWeekAbbr } from '../../../../core/utils/date-utils';
+import { todayIso } from '../../../../core/utils/date-utils';
 
 // @upgrade: Implement virtual scrolling (CDK) for large datasets with 100+ work orders
 @Component({
   selector: 'app-timeline-grid',
   standalone: true,
-  imports: [CommonModule, TimelineRowComponent, TodayIndicatorComponent],
+  imports: [TimelineRowComponent, TodayIndicatorComponent],
   templateUrl: './timeline-grid.component.html',
   styleUrl: './timeline-grid.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,21 +31,51 @@ export class TimelineGridComponent implements OnChanges, AfterViewInit {
   @ViewChild('scrollContainer') scrollContainer!: ElementRef<HTMLDivElement>;
   @ViewChild('leftPanel') leftPanel!: ElementRef<HTMLDivElement>;
 
+  /** Emits on document click so child bars can close their menus */
+  closeAllMenus$ = new Subject<void>();
+
   visibleRange!: DateRange;
   columns: ColumnDef[] = [];
   columnWidth = 60;
   totalWidth = 0;
+
+  /** Pre-computed map: workCenterId → WorkOrderDocument[] (Issue 4) */
+  ordersByCenter = new Map<string, WorkOrderDocument[]>();
+
   private hasScrolledToToday = false;
   private isExpanding = false;
+  private scrollRafPending = false;
 
   constructor(private calcService: TimelineCalcService, private cdr: ChangeDetectorRef) {}
 
-  ngOnChanges(): void {
+  /** Single delegated click-outside listener (Issue 2+3) */
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    this.closeAllMenus$.next();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['workOrders']) {
+      this.rebuildOrdersByCenter();
+    }
     this.recompute();
   }
 
   ngAfterViewInit(): void {
     this.scrollToToday();
+  }
+
+  private rebuildOrdersByCenter(): void {
+    this.ordersByCenter.clear();
+    for (const wo of this.workOrders) {
+      const id = wo.data.workCenterId;
+      const list = this.ordersByCenter.get(id);
+      if (list) {
+        list.push(wo);
+      } else {
+        this.ordersByCenter.set(id, [wo]);
+      }
+    }
   }
 
   private recompute(): void {
@@ -66,12 +96,22 @@ export class TimelineGridComponent implements OnChanges, AfterViewInit {
     this.hasScrolledToToday = true;
   }
 
-  /** Sync vertical scroll and detect edges for infinite horizontal scroll */
+  /** Sync vertical scroll and detect edges for infinite horizontal scroll (Issue 5: rAF throttle) */
   onRightScroll(): void {
     if (this.leftPanel && this.scrollContainer) {
       this.leftPanel.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollTop;
     }
 
+    if (this.scrollRafPending || this.isExpanding || !this.scrollContainer) return;
+    this.scrollRafPending = true;
+
+    requestAnimationFrame(() => {
+      this.scrollRafPending = false;
+      this.handleScrollExpansion();
+    });
+  }
+
+  private handleScrollExpansion(): void {
     if (this.isExpanding || !this.scrollContainer) return;
 
     const EDGE_THRESHOLD = 200;
@@ -110,11 +150,7 @@ export class TimelineGridComponent implements OnChanges, AfterViewInit {
   }
 
   getOrdersForCenter(workCenterId: string): WorkOrderDocument[] {
-    return this.workOrders.filter(wo => wo.data.workCenterId === workCenterId);
-  }
-
-  isToday(dateStr: string): boolean {
-    return dateStr === todayIso();
+    return this.ordersByCenter.get(workCenterId) ?? [];
   }
 
   get currentPeriodLabel(): string {
@@ -123,29 +159,5 @@ export class TimelineGridComponent implements OnChanges, AfterViewInit {
       case 'week': return 'Current week';
       case 'month': return 'Current month';
     }
-  }
-
-  /** Check if a column date falls in the current period (month for month view, week for week, today for day) */
-  isCurrentPeriod(dateStr: string): boolean {
-    const today = todayIso();
-    switch (this.timeScale) {
-      case 'day':
-        return dateStr === today;
-      case 'week': {
-        const colStart = new Date(dateStr + 'T00:00:00');
-        const colEnd = new Date(colStart);
-        colEnd.setDate(colEnd.getDate() + 6);
-        const t = new Date(today + 'T00:00:00');
-        return t >= colStart && t <= colEnd;
-      }
-      case 'month': {
-        return dateStr.slice(0, 7) === today.slice(0, 7);
-      }
-    }
-  }
-
-  isWeekend(dateStr: string): boolean {
-    const d = new Date(dateStr + 'T00:00:00');
-    return d.getDay() === 0 || d.getDay() === 6;
   }
 }

@@ -8,6 +8,7 @@
 :root {
   // Colors
   --color-primary: #635BFF;
+  --color-primary-hover: #524AE8;
   --color-white: #FFFFFF;
   --color-bg-subtle: #F9FAFB;
   --color-bg-hover: #F3F4F6;
@@ -15,7 +16,14 @@
   --color-grid-line: #F0F0F0;
   --color-text-primary: #1F2937;
   --color-text-secondary: #6B7280;
+  --color-placeholder: #C4C4C4;
   --color-today-line: #EF4444;
+
+  // Error colors
+  --color-error: #DC2626;
+  --color-error-bg: #FEF2F2;
+  --color-error-border: #FECACA;
+  --color-error-text: #991B1B;
 
   // Status colors
   --color-status-open-bg: #E8F0FE;
@@ -33,6 +41,21 @@
   --color-status-blocked-bg: #FEF3C7;
   --color-status-blocked-border: #F59E0B;
   --color-status-blocked-text: #92400E;
+
+  // Layout
+  --row-height: 52px;
+  --left-panel-width: 220px;
+
+  // Z-index layers
+  --z-grid-lines: 0;
+  --z-bars: 2;
+  --z-bars-menu-open: 30;
+  --z-sticky-header: 8;
+  --z-left-panel: 10;
+  --z-bar-dropdown: 20;
+  --z-tooltip: 1080;
+  --z-panel-overlay: 90;
+  --z-panel: 100;
 }
 
 // ── Global Reset & Font ──
@@ -95,12 +118,133 @@ html, body {
   }
 }
 
+// ── Scale dropdown overrides (moved from timeline-header component) ──
+.scale-dropdown {
+  width: 110px;
+
+  .ng-select-container {
+    border: none;
+    background: transparent;
+    min-height: 28px;
+    box-shadow: none;
+  }
+
+  .ng-value-container {
+    padding: 0;
+  }
+
+  .ng-value {
+    color: var(--color-primary);
+    font-weight: 500;
+    font-size: 13px;
+  }
+
+  .ng-arrow-wrapper {
+    padding: 0 0 0 4px;
+
+    .ng-arrow {
+      border-color: var(--color-primary) transparent transparent;
+    }
+  }
+}
+
+// ── Status select overrides (moved from work-order-panel component) ──
+.status-select {
+  .ng-select-container {
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    border-radius: 0;
+    background: transparent;
+    min-height: 34px;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .ng-value-container {
+    padding: 0;
+  }
+
+  .ng-value {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  &.ng-select-focused .ng-select-container {
+    border-bottom-color: var(--color-primary);
+  }
+}
+
+// ── ngb-tooltip overrides ──
+.tooltip {
+  position: absolute;
+  z-index: var(--z-tooltip);
+  display: block;
+  margin: 0;
+  font-size: 12px;
+  word-wrap: break-word;
+  opacity: 0;
+
+  &.show {
+    opacity: 1;
+  }
+
+  .tooltip-inner {
+    max-width: 220px;
+    padding: 6px 10px;
+    color: #fff;
+    background-color: var(--color-text-primary);
+    border-radius: 6px;
+    text-align: left;
+    white-space: pre-line;
+  }
+
+  .tooltip-arrow {
+    position: absolute;
+    display: block;
+    width: 8px;
+    height: 4px;
+
+    &::before {
+      position: absolute;
+      content: '';
+      border-color: transparent;
+      border-style: solid;
+    }
+  }
+
+  &.bs-tooltip-top {
+    padding-bottom: 4px;
+
+    .tooltip-arrow {
+      bottom: 0;
+      &::before {
+        border-width: 4px 4px 0;
+        border-top-color: var(--color-text-primary);
+      }
+    }
+  }
+
+  &.bs-tooltip-bottom {
+    padding-top: 4px;
+
+    .tooltip-arrow {
+      top: 0;
+      &::before {
+        border-width: 0 4px 4px;
+        border-bottom-color: var(--color-text-primary);
+      }
+    }
+  }
+}
+
 // ── ngb-datepicker overrides ──
 ngb-datepicker {
   font-family: inherit;
   border-radius: 8px;
   border: 1px solid var(--color-border);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: var(--z-tooltip);
+  background: var(--color-white);
 }
 
 // ── Scrollbar styling ──

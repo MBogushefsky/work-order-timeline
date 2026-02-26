@@ -34,19 +34,16 @@ test.describe('Work Order Schedule Timeline', () => {
     // Switch to Week
     await dropdown.click();
     await page.getByText('Week', { exact: true }).click();
-    await page.waitForTimeout(500);
     await expect(page.locator('.column-header').first()).toBeVisible();
 
     // Switch to Month
     await dropdown.click();
     await page.getByText('Month', { exact: true }).click();
-    await page.waitForTimeout(500);
     await expect(page.locator('.column-header').first()).toBeVisible();
 
     // Switch back to Day
     await dropdown.click();
     await page.getByText('Day', { exact: true }).click();
-    await page.waitForTimeout(500);
     await expect(page.locator('.column-header').first()).toBeVisible();
   });
 
@@ -55,10 +52,8 @@ test.describe('Work Order Schedule Timeline', () => {
     await expect(scrollContainer).toBeVisible();
 
     await scrollContainer.evaluate(el => el.scrollLeft = 0);
-    await page.waitForTimeout(200);
 
     await page.locator('.today-btn').click();
-    await page.waitForTimeout(500);
 
     const todayIndicator = page.locator('app-today-indicator');
     if (await todayIndicator.count() > 0) {
@@ -79,7 +74,13 @@ test.describe('Work Order Schedule Timeline', () => {
 
     await page.locator('#wo-name').fill('E2E Test Order');
     await page.locator('.btn-create').click();
-    await page.waitForTimeout(500);
+
+    // Wait for either the panel to close (success) or overlap error to appear
+    await expect.poll(async () => {
+      const panelClosed = !(await page.locator('.panel.open').isVisible().catch(() => false));
+      const hasOverlap = await page.locator('.overlap-error').isVisible().catch(() => false);
+      return panelClosed || hasOverlap;
+    }, { timeout: 5000 }).toBe(true);
 
     const hasBar = await page.getByText('E2E Test Order').isVisible().catch(() => false);
     const hasOverlap = await page.locator('.overlap-error').isVisible().catch(() => false);
@@ -105,7 +106,13 @@ test.describe('Work Order Schedule Timeline', () => {
 
     await page.locator('#wo-name').fill('Overlap Test Order');
     await page.locator('.btn-create').click();
-    await page.waitForTimeout(500);
+
+    // Wait for either overlap error to appear or panel to close (order created)
+    await expect.poll(async () => {
+      const hasOverlap = await page.locator('.overlap-error').isVisible().catch(() => false);
+      const panelClosed = !(await page.locator('.panel.open').isVisible().catch(() => false));
+      return hasOverlap || panelClosed;
+    }, { timeout: 5000 }).toBe(true);
 
     // Either overlap error is shown or order was created (if dates didn't overlap)
     const hasOverlapError = await page.locator('.overlap-error').isVisible().catch(() => false);
@@ -118,7 +125,7 @@ test.describe('Work Order Schedule Timeline', () => {
     await expect(bar).toBeVisible();
 
     await bar.locator('.bar-menu-btn').click();
-    await page.waitForTimeout(300);
+    await expect(page.locator('.menu-item').filter({ hasText: 'Edit' })).toBeVisible();
 
     await page.locator('.menu-item').filter({ hasText: 'Edit' }).click();
 
@@ -131,7 +138,6 @@ test.describe('Work Order Schedule Timeline', () => {
     await nameInput.fill('Edited Order Name');
 
     await page.locator('.btn-create').click();
-    await page.waitForTimeout(500);
 
     await expect(page.getByText('Edited Order Name')).toBeVisible({ timeout: 5000 });
   });
@@ -140,15 +146,15 @@ test.describe('Work Order Schedule Timeline', () => {
     const initialCount = await page.locator('.bar').count();
     expect(initialCount).toBeGreaterThan(0);
 
+    // Accept the confirm dialog when it appears
+    page.on('dialog', dialog => dialog.accept());
+
     const bar = page.locator('.bar').first();
     await bar.locator('.bar-menu-btn').click();
-    await page.waitForTimeout(300);
+    await expect(page.locator('.menu-item--danger')).toBeVisible();
     await page.locator('.menu-item--danger').click();
 
-    await page.waitForTimeout(500);
-
-    const newCount = await page.locator('.bar').count();
-    expect(newCount).toBe(initialCount - 1);
+    await expect(page.locator('.bar')).toHaveCount(initialCount - 1, { timeout: 5000 });
   });
 
   test('panel close via Escape key and overlay click', async ({ page }) => {
@@ -186,7 +192,6 @@ test.describe('Work Order Schedule Timeline', () => {
 
     await page.locator('#wo-name').fill('Persist Test Order');
     await page.locator('.btn-create').click();
-    await page.waitForTimeout(500);
 
     const created = await page.getByText('Persist Test Order').isVisible().catch(() => false);
     if (created) {

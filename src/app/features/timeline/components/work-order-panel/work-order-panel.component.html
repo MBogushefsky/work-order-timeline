@@ -32,6 +32,7 @@
         type="text"
         formControlName="name"
         placeholder="Name"
+        maxlength="100"
         aria-required="true"
         [class.invalid]="form.get('name')?.invalid && form.get('name')?.touched"
       />
@@ -51,6 +52,28 @@
         [searchable]="false"
         class="status-select"
       ></ng-select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="wo-start-date">Start date</label>
+      <div class="input-group">
+        <input
+          id="wo-start-date"
+          class="form-input"
+          placeholder="MM.DD.YYYY"
+          ngbDatepicker
+          #dpStart="ngbDatepicker"
+          formControlName="startDate"
+          [container]="'body'"
+          aria-required="true"
+          [class.invalid]="form.get('startDate')?.invalid && form.get('startDate')?.touched"
+          (click)="dpStart.toggle()"
+          readonly
+        />
+      </div>
+      @if (form.get('startDate')?.invalid && form.get('startDate')?.touched) {
+        <span class="form-error">Start date is required</span>
+      }
     </div>
 
     <div class="form-group">
@@ -75,28 +98,6 @@
       }
       @if (form.hasError('endBeforeStart') && form.get('endDate')?.touched) {
         <span class="form-error">End date must be after start date</span>
-      }
-    </div>
-
-    <div class="form-group">
-      <label class="form-label" for="wo-start-date">Start date</label>
-      <div class="input-group">
-        <input
-          id="wo-start-date"
-          class="form-input"
-          placeholder="MM.DD.YYYY"
-          ngbDatepicker
-          #dpStart="ngbDatepicker"
-          formControlName="startDate"
-          [container]="'body'"
-          aria-required="true"
-          [class.invalid]="form.get('startDate')?.invalid && form.get('startDate')?.touched"
-          (click)="dpStart.toggle()"
-          readonly
-        />
-      </div>
-      @if (form.get('startDate')?.invalid && form.get('startDate')?.touched) {
-        <span class="form-error">Start date is required</span>
       }
     </div>
 

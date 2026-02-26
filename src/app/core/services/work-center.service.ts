@@ -4,10 +4,10 @@ import { SEED_WORK_CENTERS } from '../data/seed-data';
 
 @Injectable({ providedIn: 'root' })
 export class WorkCenterService {
-  private workCenters: WorkCenterDocument[] = SEED_WORK_CENTERS;
+  private readonly workCenters: WorkCenterDocument[] = SEED_WORK_CENTERS;
 
   getAll(): WorkCenterDocument[] {
-    return this.workCenters;
+    return [...this.workCenters];
   }
 
   getById(docId: string): WorkCenterDocument | undefined {

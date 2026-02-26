@@ -64,18 +64,23 @@ export class TimelineCalcService {
     }
   }
 
-  /** Generate column definitions for the header row */
+  /** Generate column definitions for the header row (pre-computes isCurrentPeriod/isWeekend) */
   generateColumns(range: DateRange, scale: TimeScale): ColumnDef[] {
     const columns: ColumnDef[] = [];
+    const today = todayIso();
 
     switch (scale) {
       case 'day': {
         let current = range.start;
         while (current <= range.end) {
+          const d = new Date(current + 'T00:00:00');
+          const dow = d.getDay();
           columns.push({
             label: formatDateHeader(current, 'day'),
             sublabel: dayOfWeekAbbr(current),
             date: current,
+            isCurrentPeriod: current === today,
+            isWeekend: dow === 0 || dow === 6,
           });
           current = addDays(current, 1);
         }
@@ -84,9 +89,15 @@ export class TimelineCalcService {
       case 'week': {
         let current = startOfWeek(range.start);
         while (current <= range.end) {
+          const colStart = new Date(current + 'T00:00:00');
+          const colEnd = new Date(colStart);
+          colEnd.setDate(colEnd.getDate() + 6);
+          const t = new Date(today + 'T00:00:00');
           columns.push({
             label: formatDateHeader(current, 'week'),
             date: current,
+            isCurrentPeriod: t >= colStart && t <= colEnd,
+            isWeekend: false,
           });
           current = addDays(current, 7);
         }
@@ -94,10 +105,13 @@ export class TimelineCalcService {
       }
       case 'month': {
         let current = startOfMonth(range.start);
+        const todayMonth = today.slice(0, 7);
         while (current <= range.end) {
           columns.push({
             label: formatDateHeader(current, 'month'),
             date: current,
+            isCurrentPeriod: current.slice(0, 7) === todayMonth,
+            isWeekend: false,
           });
           current = addMonths(current, 1);
         }

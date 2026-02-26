@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, Output,
   OnChanges, SimpleChanges, ViewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgbDatepickerModule, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
@@ -16,7 +15,7 @@ import { isoToNgbDate, ngbDateToIso, addDays } from '../../../../core/utils/date
 @Component({
   selector: 'app-work-order-panel',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgSelectModule, NgbDatepickerModule],
+  imports: [ReactiveFormsModule, NgSelectModule, NgbDatepickerModule],
   templateUrl: './work-order-panel.component.html',
   styleUrl: './work-order-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -82,7 +81,7 @@ export class WorkOrderPanelComponent implements OnChanges {
 
   private buildForm(): void {
     this.form = this.fb.group({
-      name: ['', Validators.required],
+      name: ['', [Validators.required, Validators.maxLength(100)]],
       status: ['open', Validators.required],
       workCenterId: ['', Validators.required],
       startDate: [null as NgbDateStruct | null, Validators.required],

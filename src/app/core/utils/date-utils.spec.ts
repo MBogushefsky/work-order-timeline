@@ -88,6 +88,22 @@ describe('date-utils', () => {
     it('crosses year boundary', () => {
       expect(addMonths('2025-11-15', 3)).toBe('2026-02-15');
     });
+
+    it('clamps Jan 31 + 1 month to Feb 28 (non-leap)', () => {
+      expect(addMonths('2025-01-31', 1)).toBe('2025-02-28');
+    });
+
+    it('clamps Jan 31 + 1 month to Feb 29 (leap year)', () => {
+      expect(addMonths('2024-01-31', 1)).toBe('2024-02-29');
+    });
+
+    it('clamps Mar 31 + 1 month to Apr 30', () => {
+      expect(addMonths('2025-03-31', 1)).toBe('2025-04-30');
+    });
+
+    it('handles adding months to end-of-month dates', () => {
+      expect(addMonths('2025-08-31', 1)).toBe('2025-09-30');
+    });
   });
 
   describe('startOfMonth', () => {
@@ -143,6 +159,12 @@ describe('date-utils', () => {
     it('week scale: returns "Mon DD - DD" range', () => {
       const result = formatDateHeader('2025-06-16', 'week');
       expect(result).toBe('Jun 16 - 22');
+    });
+
+    it('week scale: shows both months when range crosses month boundary', () => {
+      // 2025-06-30 is a Monday, end is Jul 6
+      const result = formatDateHeader('2025-06-30', 'week');
+      expect(result).toBe('Jun 30 - Jul 6');
     });
 
     it('month scale: returns "Mon YYYY"', () => {

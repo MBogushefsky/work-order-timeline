@@ -1,18 +1,18 @@
-import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { Observable, Subscription } from 'rxjs';
 import { WorkOrderDocument } from '../../../../core/models/work-order.model';
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 
 @Component({
   selector: 'app-work-order-bar',
   standalone: true,
-  imports: [CommonModule, StatusLabelPipe, NgbTooltipModule],
+  imports: [StatusLabelPipe, NgbTooltipModule],
   template: `
     <div
       class="bar"
       role="button"
-      [class]="'bar status-' + workOrder.data.status"
+      [class]="'bar status-' + workOrder.data.status + (menuOpen ? ' menu-open' : '')"
       [style.left.px]="leftPx"
       [style.width.px]="widthPx"
       [ngbTooltip]="tooltipText" container="body" placement="top"
@@ -40,21 +40,38 @@ import { StatusLabelPipe } from '../../pipes/status-label.pipe';
   styleUrl: './work-order-bar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class WorkOrderBarComponent {
+export class WorkOrderBarComponent implements OnInit, OnDestroy {
   @Input() workOrder!: WorkOrderDocument;
   @Input() leftPx = 0;
   @Input() widthPx = 100;
+  @Input() closeAllMenus$!: Observable<void>;
   @Output() edit = new EventEmitter<WorkOrderDocument>();
   @Output() delete = new EventEmitter<WorkOrderDocument>();
 
   menuOpen = false;
+  private closeMenuSub?: Subscription;
 
   get tooltipText(): string {
     const d = this.workOrder.data;
     return `${d.name}\nStatus: ${d.status.charAt(0).toUpperCase() + d.status.slice(1).replace('-', ' ')}\n${d.startDate} → ${d.endDate}`;
   }
 
-  constructor(private elRef: ElementRef) {}
+  constructor(private cdr: ChangeDetectorRef) {}
+
+  ngOnInit(): void {
+    if (this.closeAllMenus$) {
+      this.closeMenuSub = this.closeAllMenus$.subscribe(() => {
+        if (this.menuOpen) {
+          this.menuOpen = false;
+          this.cdr.markForCheck();
+        }
+      });
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.closeMenuSub?.unsubscribe();
+  }
 
   toggleMenu(event: MouseEvent): void {
     event.stopPropagation();
@@ -72,13 +89,5 @@ export class WorkOrderBarComponent {
     event.stopPropagation();
     this.menuOpen = false;
     this.delete.emit(this.workOrder);
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    if (!this.menuOpen) return;
-    if (!this.elRef.nativeElement.contains(event.target)) {
-      this.menuOpen = false;
-    }
   }
 }

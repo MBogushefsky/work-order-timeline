@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Subject } from 'rxjs';
 import { WorkOrderBarComponent } from './work-order-bar.component';
 import { WorkOrderDocument } from '../../../../core/models/work-order.model';
 
@@ -17,15 +18,18 @@ const mockWorkOrder: WorkOrderDocument = {
 describe('WorkOrderBarComponent', () => {
   let component: WorkOrderBarComponent;
   let fixture: ComponentFixture<WorkOrderBarComponent>;
+  let closeAllMenus$: Subject<void>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [WorkOrderBarComponent],
     }).compileComponents();
 
+    closeAllMenus$ = new Subject<void>();
     fixture = TestBed.createComponent(WorkOrderBarComponent);
     component = fixture.componentInstance;
     component.workOrder = mockWorkOrder;
+    component.closeAllMenus$ = closeAllMenus$.asObservable();
     fixture.detectChanges();
   });
 
@@ -87,18 +91,16 @@ describe('WorkOrderBarComponent', () => {
     });
   });
 
-  describe('onDocumentClick', () => {
-    it('closes menu when clicking outside', () => {
+  describe('closeAllMenus$', () => {
+    it('closes menu when closeAllMenus$ emits', () => {
       component.menuOpen = true;
-      const outsideEvent = new MouseEvent('click');
-      // Simulate click outside the element
-      component.onDocumentClick(outsideEvent);
+      closeAllMenus$.next();
       expect(component.menuOpen).toBe(false);
     });
 
     it('does nothing when menu is already closed', () => {
       component.menuOpen = false;
-      component.onDocumentClick(new MouseEvent('click'));
+      closeAllMenus$.next();
       expect(component.menuOpen).toBe(false);
     });
   });
