@@ -86,7 +86,7 @@
   position: relative;
 
   &.current {
-    background: #EEF0FF;
+    background: var(--color-status-open-bg);
   }
 
   &.weekend {
@@ -140,7 +140,7 @@
   height: 100%;
 
   &.current {
-    background: #EEF0FF;
+    background: var(--color-status-open-bg);
   }
 
   &.weekend {
