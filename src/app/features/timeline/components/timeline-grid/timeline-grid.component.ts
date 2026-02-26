@@ -1,5 +1,5 @@
 import {
-  ChangeDetectionStrategy, Component, EventEmitter, Input, Output, OnChanges,
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output, OnChanges,
   ViewChild, ElementRef, AfterViewInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -36,8 +36,9 @@ export class TimelineGridComponent implements OnChanges, AfterViewInit {
   columnWidth = 60;
   totalWidth = 0;
   private hasScrolledToToday = false;
+  private isExpanding = false;
 
-  constructor(private calcService: TimelineCalcService) {}
+  constructor(private calcService: TimelineCalcService, private cdr: ChangeDetectorRef) {}
 
   ngOnChanges(): void {
     this.recompute();
@@ -52,6 +53,7 @@ export class TimelineGridComponent implements OnChanges, AfterViewInit {
     this.visibleRange = this.calcService.getVisibleRange(this.timeScale);
     this.columns = this.calcService.generateColumns(this.visibleRange, this.timeScale);
     this.totalWidth = this.columns.length * this.columnWidth;
+    this.isExpanding = false;
   }
 
   scrollToToday(): void {
@@ -64,10 +66,46 @@ export class TimelineGridComponent implements OnChanges, AfterViewInit {
     this.hasScrolledToToday = true;
   }
 
-  /** Sync vertical scroll between left panel and right scroll container */
+  /** Sync vertical scroll and detect edges for infinite horizontal scroll */
   onRightScroll(): void {
     if (this.leftPanel && this.scrollContainer) {
       this.leftPanel.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollTop;
+    }
+
+    if (this.isExpanding || !this.scrollContainer) return;
+
+    const EDGE_THRESHOLD = 200;
+    const el = this.scrollContainer.nativeElement;
+    const maxColumns = this.calcService.getMaxColumns(this.timeScale);
+
+    // Expand left (prepend columns)
+    if (el.scrollLeft < EDGE_THRESHOLD && this.columns.length < maxColumns) {
+      this.isExpanding = true;
+      const oldScrollLeft = el.scrollLeft;
+      const oldScrollWidth = el.scrollWidth;
+
+      this.visibleRange = this.calcService.expandRange(this.visibleRange, this.timeScale, 'left');
+      this.columns = this.calcService.generateColumns(this.visibleRange, this.timeScale);
+      this.totalWidth = this.columns.length * this.columnWidth;
+      this.cdr.detectChanges();
+
+      const addedWidth = el.scrollWidth - oldScrollWidth;
+      el.scrollLeft = oldScrollLeft + addedWidth;
+
+      requestAnimationFrame(() => { this.isExpanding = false; });
+      return;
+    }
+
+    // Expand right (append columns)
+    if (el.scrollLeft + el.clientWidth > el.scrollWidth - EDGE_THRESHOLD && this.columns.length < maxColumns) {
+      this.isExpanding = true;
+
+      this.visibleRange = this.calcService.expandRange(this.visibleRange, this.timeScale, 'right');
+      this.columns = this.calcService.generateColumns(this.visibleRange, this.timeScale);
+      this.totalWidth = this.columns.length * this.columnWidth;
+      this.cdr.markForCheck();
+
+      requestAnimationFrame(() => { this.isExpanding = false; });
     }
   }
 

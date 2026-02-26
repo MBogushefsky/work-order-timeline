@@ -24,7 +24,6 @@ export class TimelineCalcService {
     }
   }
 
-  // @upgrade: Implement infinite scroll to dynamically load columns on scroll edge detection
   /** Compute the visible date range centered on today with buffer for each timescale */
   getVisibleRange(scale: TimeScale): DateRange {
     const today = todayIso();
@@ -35,6 +34,33 @@ export class TimelineCalcService {
         return { start: addDays(today, -56), end: addDays(today, 56) };
       case 'month':
         return { start: addMonths(today, -6), end: addMonths(today, 6) };
+    }
+  }
+
+  /** Maximum number of columns to prevent unbounded memory growth */
+  getMaxColumns(scale: TimeScale): number {
+    switch (scale) {
+      case 'day':   return 730;  // ~2 years
+      case 'week':  return 104;  // ~2 years
+      case 'month': return 24;   // 2 years
+    }
+  }
+
+  /** Expand a date range in the given direction using the same buffer as the initial range */
+  expandRange(range: DateRange, scale: TimeScale, direction: 'left' | 'right'): DateRange {
+    switch (scale) {
+      case 'day':
+        return direction === 'left'
+          ? { start: addDays(range.start, -14), end: range.end }
+          : { start: range.start, end: addDays(range.end, 14) };
+      case 'week':
+        return direction === 'left'
+          ? { start: addDays(range.start, -56), end: range.end }
+          : { start: range.start, end: addDays(range.end, 56) };
+      case 'month':
+        return direction === 'left'
+          ? { start: addMonths(range.start, -6), end: range.end }
+          : { start: range.start, end: addMonths(range.end, 6) };
     }
   }
 

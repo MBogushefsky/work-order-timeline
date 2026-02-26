@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { WorkCenterDocument } from '../../../core/models/work-center.model';
@@ -42,6 +42,7 @@ export class TimelinePageComponent implements OnInit, OnDestroy {
   constructor(
     private workCenterService: WorkCenterService,
     private workOrderService: WorkOrderService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -71,7 +72,7 @@ export class TimelinePageComponent implements OnInit, OnDestroy {
     this.selectedWorkCenterId = event.workCenterId;
     this.clickedDate = event.date;
     // Delay panel open so click-outside handler doesn't immediately close it
-    setTimeout(() => { this.panelOpen = true; }, 0);
+    setTimeout(() => { this.panelOpen = true; this.cdr.markForCheck(); }, 0);
   }
 
   onEditWorkOrder(order: WorkOrderDocument): void {
@@ -79,7 +80,7 @@ export class TimelinePageComponent implements OnInit, OnDestroy {
     this.selectedWorkOrder = order;
     this.selectedWorkCenterId = order.data.workCenterId;
     this.clickedDate = order.data.startDate;
-    setTimeout(() => { this.panelOpen = true; }, 0);
+    setTimeout(() => { this.panelOpen = true; this.cdr.markForCheck(); }, 0);
   }
 
   onDeleteWorkOrder(order: WorkOrderDocument): void {
